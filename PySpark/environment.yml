@@ -1,0 +1,7 @@
+name: pyspark-env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - openjdk=17
+  - pyspark=4.2

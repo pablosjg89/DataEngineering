@@ -140,12 +140,39 @@ pipeline = (
 )
 pipeline.show()
 
-# Group by and aggregate
+# Row-level filters examples
+print("\nRow-level filters: salaries between 55000 and 80000 and in Engineering or Sales:")
+df.filter((col("Salary") >= 55000) & (col("Salary") <= 80000) & (col("Department").isin(["Engineering", "Sales"]))).show()
+
+print("\nFilter using SQL-style string expression (Department = 'HR'):")
+df.filter("Department = 'HR'").show()
+
+print("\nFilter using LIKE (names starting with 'A'):")
+df.filter(col("Name").like("A% ") ).show() if False else df.filter(col("Name").like("A%" )).show()
+
+# Group by and aggregate examples
 print("\nAverage salary by department:")
 df.groupBy("Department").agg(
     avg("Salary").alias("AvgSalary"),
     count("*").alias("Count")
 ).show()
+
+print("\nAggregations with ordering: average salary by department, descending:")
+df.groupBy("Department").agg(avg("Salary").alias("AvgSalary"), count("*").alias("Count")).orderBy(col("AvgSalary").desc()).show()
+
+print("\nGroup by with filter on aggregate (departments with avg salary > 60000):")
+from pyspark.sql import functions as F
+agg_df = df.groupBy("Department").agg(F.avg("Salary").alias("AvgSalary"), F.count("*").alias("Count"))
+agg_df.filter(col("AvgSalary") > 60000).show()
+
+# Example: combined grouping with multiple aggregations and renaming
+print("\nDetailed department stats (avg, min, max, count):")
+df.groupBy("Department").agg(
+    F.avg("Salary").alias("AvgSalary"),
+    F.min("Salary").alias("MinSalary"),
+    F.max("Salary").alias("MaxSalary"),
+    F.count("*").alias("EmployeeCount")
+).orderBy(col("AvgSalary").desc()).show()
 
 # Select specific columns
 print("\nNames and Departments:")

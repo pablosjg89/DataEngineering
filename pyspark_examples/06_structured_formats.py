@@ -10,6 +10,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import explode, col
 import tempfile
 import os
+import json
 
 spark = SparkSession.builder \
     .appName("StructuredFormats") \
@@ -42,8 +43,6 @@ tmp_dir = tempfile.mkdtemp()
 json_path = os.path.join(tmp_dir, "nested.json")
 with open(json_path, "w", encoding="utf-8") as f:
     for obj in nested:
-        import json
-
         f.write(json.dumps(obj) + "\n")
 
 print("Wrote nested JSON to:", json_path)

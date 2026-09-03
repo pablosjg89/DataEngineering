@@ -46,8 +46,32 @@ df.orderBy(col("Salary").asc()).show()
 print("\nSort by Salary descending, then Name ascending:")
 df.orderBy(col("Salary").desc(), col("Name").asc()).show()
 
+print("\nSort using sort() alias (Salary descending):")
+df.sort(col("Salary").desc()).show()
+
 print("\nTop 2 highest-paid employees:")
 df.orderBy(col("Salary").desc()).limit(2).show()
+
+# Handling missing values (na.drop)
+print("\nExample DataFrame with nulls:")
+data_with_nulls = [
+    ("Alice", "Sales", 50000),
+    ("Frank", None, None),
+    ("Grace", "HR", None),
+]
+cols = ["Name", "Department", "Salary"]
+null_df = spark.createDataFrame(data_with_nulls, cols)
+null_df.show()
+
+print("\nDrop rows with ANY nulls (na.drop() default):")
+null_df.na.drop().show()
+
+print("\nDrop rows where 'Salary' is null only:")
+null_df.na.drop(subset=["Salary"]).show()
+
+print("\nFill null salaries with 0 and show sorted by Salary:")
+filled = null_df.na.fill({"Salary": 0})
+filled.orderBy(col("Salary").desc()).show()
 
 # Group by and aggregate
 print("\nAverage salary by department:")

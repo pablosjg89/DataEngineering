@@ -36,9 +36,29 @@ This directory contains a collection of PySpark examples for learning and refere
    - Reading nested JSON and extracting fields
    - Writing and reading partitioned Parquet with schema merging and partition filters
 
+7. **07_functions_library.py** - Understanding pyspark.sql.functions (F library)
+   - Column functions (col, lit, concat)
+   - String functions (upper, lower, length, substring)
+   - Conditional functions (when, otherwise, coalesce)
+   - Aggregation functions (avg, sum, count, min, max, stddev)
+   - Date functions (current_date, date_add, datediff)
+   - Window functions (row_number, rank, lag, lead)
+   - Why to use the F alias and how to compose operations
+
 ## About pyspark.sql.functions (alias F)
 
-Many examples import pyspark.sql.functions and alias it as `F` (for example: `from pyspark.sql import functions as F`). This module provides a rich set of SQL-style functions (avg, count, min, max, when, lit, col, concat, explode, etc.) that operate on Columns. Using the `F` alias keeps code concise and makes it clear these are built-in Spark functions (e.g., `F.avg('col')`). When writing multiple expressions or aggregations, prefer `F.*` to avoid name collisions and improve readability.
+Many examples import pyspark.sql.functions and alias it as `F` (for example: `from pyspark.sql import functions as F`). This module provides essential SQL-style functions including:
+
+- **Column functions**: col, lit, concat, coalesce
+- **String functions**: upper, lower, length, substring, trim
+- **Conditional functions**: when, otherwise
+- **Aggregation functions**: avg, count, sum, min, max, stddev
+- **Date functions**: current_date, date_add, datediff
+- **Window functions**: row_number, rank, dense_rank, lag, lead
+
+Using the `F` alias keeps code concise (e.g., `F.avg('col')`) and clear that these are Spark functions. It also avoids name collisions with Python built-ins (like `sum()`). When writing multiple expressions or aggregations, prefer `F.*` to improve readability and consistency.
+
+See **07_functions_library.py** for comprehensive examples and explanations of all major function categories.
 
 ## Running the Examples
 
@@ -51,6 +71,7 @@ python 03_joins_and_unions.py
 python 04_file_operations.py
 python 05_sql_queries.py
 python 06_structured_formats.py
+python 07_functions_library.py
 ```
 
 ## Notes

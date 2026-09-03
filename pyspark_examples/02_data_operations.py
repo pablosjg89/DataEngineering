@@ -73,6 +73,16 @@ print("\nFill null salaries with 0 and show sorted by Salary:")
 filled = null_df.na.fill({"Salary": 0})
 filled.orderBy(col("Salary").desc()).show()
 
+# Use case: sorting to create a deterministic leaderboard before export or reporting
+# Sorting provides deterministic order for downstream consumers and makes "top N" selection trivial.
+print("\nUse case - Leaderboard: Employees ordered by Salary (descending), Name ascending:")
+leaderboard = df.orderBy(col("Salary").desc(), col("Name").asc())
+leaderboard.show()
+
+# Example: grab top 3 for a report
+print("\nTop 3 employees for a report:")
+leaderboard.limit(3).show()
+
 # Group by and aggregate
 print("\nAverage salary by department:")
 df.groupBy("Department").agg(

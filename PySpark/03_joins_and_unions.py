@@ -40,24 +40,24 @@ dept_df.show()
 # --- Basic Join Examples (same column names) ---
 print("\n--- BASIC JOINS (common column name) ---")
 
-# Inner Join (default)
+# Inner Join (default) - explicit on and how parameters
 print("\nInner Join (only matching records):")
-inner_join_df = emp_df.join(dept_df, "DepartmentID")
+inner_join_df = emp_df.join(dept_df, on="DepartmentID", how="inner")
 inner_join_df.show()
 
 # Left Join (all from left, matching from right)
 print("\nLeft Join (all employees, matching departments):")
-left_join_df = emp_df.join(dept_df, "DepartmentID", "left")
+left_join_df = emp_df.join(dept_df, on="DepartmentID", how="left")
 left_join_df.show()
 
 # Right Join (all from right, matching from left)
 print("\nRight Join (all departments, matching employees):")
-right_join_df = emp_df.join(dept_df, "DepartmentID", "right")
+right_join_df = emp_df.join(dept_df, on="DepartmentID", how="right")
 right_join_df.show()
 
 # Outer Join (all records from both sides)
 print("\nOuter Join (all records from both sides):")
-outer_join_df = emp_df.join(dept_df, "DepartmentID", "outer")
+outer_join_df = emp_df.join(dept_df, on="DepartmentID", how="outer")
 outer_join_df.show()
 
 # --- Join with Different Column Names ---
@@ -78,11 +78,11 @@ sal_df.show()
 
 # Join with different column names using explicit condition
 print("\nJoin employees and salaries (EmployeeID = PersonID) - Inner:")
-salary_join = emp_df.join(sal_df, col("EmployeeID") == col("PersonID"), "inner")
+salary_join = emp_df.join(sal_df, on=(col("EmployeeID") == col("PersonID")), how="inner")
 salary_join.show()
 
 print("\nLeft Join: all employees, matching salaries:")
-salary_left_join = emp_df.join(sal_df, col("EmployeeID") == col("PersonID"), "left")
+salary_left_join = emp_df.join(sal_df, on=(col("EmployeeID") == col("PersonID")), how="left")
 salary_left_join.show()
 
 # --- Multiple Field Joins ---
@@ -116,9 +116,9 @@ assign_df.show()
 print("\nInner Join on multiple fields (EmployeeID AND DepartmentID):")
 multi_join = proj_df.join(
     assign_df,
-    (col("proj_df.EmployeeID") == col("assign_df.EmployeeID")) & 
-    (col("proj_df.DepartmentID") == col("assign_df.DepartmentID")),
-    "inner"
+    on=((col("proj_df.EmployeeID") == col("assign_df.EmployeeID")) & 
+        (col("proj_df.DepartmentID") == col("assign_df.DepartmentID"))),
+    how="inner"
 )
 multi_join.show()
 
@@ -126,8 +126,8 @@ multi_join.show()
 print("\nLeft Join on multiple fields (using implicit names):")
 multi_left_join = proj_df.join(
     assign_df,
-    ["EmployeeID", "DepartmentID"],
-    "left"
+    on=["EmployeeID", "DepartmentID"],
+    how="left"
 )
 multi_left_join.show()
 
@@ -135,8 +135,8 @@ multi_left_join.show()
 print("\nFull Outer Join on multiple fields:")
 multi_outer_join = proj_df.join(
     assign_df,
-    ["EmployeeID", "DepartmentID"],
-    "outer"
+    on=["EmployeeID", "DepartmentID"],
+    how="outer"
 )
 multi_outer_join.show()
 

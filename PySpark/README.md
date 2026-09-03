@@ -17,8 +17,9 @@ This directory contains a collection of PySpark examples for learning and refere
    - Column operations: withColumn(), withColumnRenamed(), drop() (derived metrics, renaming, and pruning)
 
 3. **03_joins_and_unions.py** - Joins and Unions with PySpark
-   - Inner joins between DataFrames
-   - Left joins
+   - Inner, left, right, and outer join examples
+   - Joins with different column names (explicit conditions)
+   - Multiple field joins (composite keys)
    - Union operations to combine DataFrames
 
 4. **04_file_operations.py** - File Operations with PySpark

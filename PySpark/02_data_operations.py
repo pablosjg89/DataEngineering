@@ -4,7 +4,27 @@ Examples of filtering, grouping, and aggregating data.
 """
 
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, sum, avg, count
+from pyspark.sql.functions import col, sum, avg, count, min, max
+
+# --- About pyspark.sql.functions (F library) ---
+# The 'functions' module provides SQL-like functions for DataFrame operations:
+# - Column expressions: col(), lit(), concat(), when(), etc.
+# - Aggregations: avg(), count(), sum(), min(), max(), etc.
+# - Window functions: row_number(), rank(), dense_rank(), etc.
+# - String operations: upper(), lower(), substring(), trim(), etc.
+# - Date/time functions: current_date(), date_add(), etc.
+#
+# Why use 'from pyspark.sql import functions as F'?
+# 1. Alias 'F' keeps code concise: F.avg('col') vs functions.avg('col')
+# 2. Avoids name conflicts with Python built-ins: F.sum() vs Python's sum()
+# 3. Makes it clear these are Spark functions, not Python stdlib
+# 4. Standard convention across PySpark community
+#
+# Common usage patterns:
+#   - Aggregations: df.groupBy("col").agg(F.avg("salary"), F.count("*"))
+#   - Transformations: df.withColumn("new_col", F.upper(F.col("name")))
+#   - Filtering: df.filter(F.col("salary") > 50000)
+#   - Conditional logic: df.select(F.when(F.col("age") > 18, "Adult").otherwise("Minor"))
 
 spark = SparkSession.builder \
     .appName("DataOperations") \
@@ -77,6 +97,27 @@ print("\nFill null salaries with 0 and show sorted by Salary:")
 filled = null_df.na.fill({"Salary": 0})
 filled.orderBy(col("Salary").desc()).show()
 
+# --- Alternate null-handling APIs ---
+print("\nAlternate null-handling APIs:")
+# 1) Using where() with isNotNull()
+print("\nRows where Salary is not null (using where(...).isNotNull()):")
+df.where(col("Salary").isNotNull()).show()
+
+# 2) na.drop(how='all') - drops rows where ALL columns are null
+print("\nDrop rows where ALL columns are null (na.drop(how='all')):")
+all_nulls = [ (None, None, None), ("Hank", None, 45000) ]
+all_nulls_df = spark.createDataFrame(all_nulls, cols)
+all_nulls_df.show()
+all_nulls_df.na.drop(how="all").show()
+
+# 3) na.fill() for multiple columns
+print("\nFill nulls with defaults (na.fill) for multiple columns:")
+filled_multi = null_df.na.fill({"Department": "Unknown", "Salary": -1})
+filled_multi.show()
+
+print("\nAfter filling, sort by Salary to see defaulted rows at bottom:")
+filled_multi.sort(col("Salary").desc()).show()
+
 # Use case: sorting to create a deterministic leaderboard before export or reporting
 # Sorting provides deterministic order for downstream consumers and makes "top N" selection trivial.
 print("\nUse case - Leaderboard: Employees ordered by Salary (descending), Name ascending:")
@@ -87,12 +128,70 @@ leaderboard.show()
 print("\nTop 3 employees for a report:")
 leaderboard.limit(3).show()
 
-# Group by and aggregate
+# Column operations: derived columns, renaming, and dropping
+print("\nColumn operations examples:")
+# 1) withColumn - create a derived metric (10% raise)
+print("\nAdd derived column 'SalaryAfterRaise' (10% raise):")
+with_raise = df.withColumn("SalaryAfterRaise", (col("Salary") * 1.10))
+with_raise.select("Name", "Salary", "SalaryAfterRaise").show()
+
+# 2) chain withColumn to create another transformed column
+print("\nAdd 'SalaryK' derived from SalaryAfterRaise (in thousands):")
+with_raise = with_raise.withColumn("SalaryK", (col("SalaryAfterRaise") / 1000))
+with_raise.select("Name", "SalaryAfterRaise", "SalaryK").show()
+
+# 3) withColumnRenamed - improve clarity
+print("\nRename 'Salary' to 'BaseSalary' for clarity:")
+renamed = df.withColumnRenamed("Salary", "BaseSalary")
+renamed.show()
+
+# 4) drop - remove redundant columns to focus dataset
+print("\nDrop 'Department' column to focus on salaries:")
+dropped = renamed.drop("Department")
+dropped.show()
+
+# 5) combined: compute derived, rename, and drop in a pipeline
+print("\nPipeline: compute, rename, and drop in one chain:")
+pipeline = (
+    df.withColumn("SalaryAfterRaise", col("Salary") * 1.10)
+      .withColumn("SalaryK", col("SalaryAfterRaise") / 1000)
+      .withColumnRenamed("Salary", "BaseSalary")
+      .drop("Department")
+)
+pipeline.show()
+
+# Row-level filters examples
+print("\nRow-level filters: salaries between 55000 and 80000 and in Engineering or Sales:")
+df.filter((col("Salary") >= 55000) & (col("Salary") <= 80000) & (col("Department").isin(["Engineering", "Sales"]))).show()
+
+print("\nFilter using SQL-style string expression (Department = 'HR'):")
+df.filter("Department = 'HR'").show()
+
+print("\nFilter using LIKE (names starting with 'A'):")
+df.filter(col("Name").like("A% ") ).show() if False else df.filter(col("Name").like("A%" )).show()
+
+# Group by and aggregate examples
 print("\nAverage salary by department:")
 df.groupBy("Department").agg(
     avg("Salary").alias("AvgSalary"),
     count("*").alias("Count")
 ).show()
+
+print("\nAggregations with ordering: average salary by department, descending:")
+df.groupBy("Department").agg(avg("Salary").alias("AvgSalary"), count("*").alias("Count")).orderBy(col("AvgSalary").desc()).show()
+
+print("\nGroup by with filter on aggregate (departments with avg salary > 60000):")
+agg_df = df.groupBy("Department").agg(avg("Salary").alias("AvgSalary"), count("*").alias("Count"))
+agg_df.filter(col("AvgSalary") > 60000).show()
+
+# Example: combined grouping with multiple aggregations and renaming
+print("\nDetailed department stats (avg, min, max, count):")
+df.groupBy("Department").agg(
+    avg("Salary").alias("AvgSalary"),
+    min("Salary").alias("MinSalary"),
+    max("Salary").alias("MaxSalary"),
+    count("*").alias("EmployeeCount")
+).orderBy(col("AvgSalary").desc()).show()
 
 # Select specific columns
 print("\nNames and Departments:")

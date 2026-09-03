@@ -49,6 +49,10 @@ df.orderBy(col("Salary").desc(), col("Name").asc()).show()
 print("\nSort using sort() alias (Salary descending):")
 df.sort(col("Salary").desc()).show()
 
+# Simple use case: a straightforward alphabetical sort for reporting
+print("\nSimple use case - alphabetical sort by Name:")
+df.sort("Name").show()
+
 print("\nTop 2 highest-paid employees:")
 df.orderBy(col("Salary").desc()).limit(2).show()
 

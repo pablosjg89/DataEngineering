@@ -45,6 +45,15 @@ This directory contains a collection of PySpark examples for learning and refere
    - Window functions (row_number, rank, lag, lead)
    - Why to use the F alias and how to compose operations
 
+8. **08_arrays_and_maps.py** - Complex Data Types: Arrays and Maps
+   - Creating and manipulating arrays
+   - Array operations: contains, size, join, distinct, union
+   - Creating and working with maps (key-value pairs)
+   - Map operations: keys, values, concat
+   - Array of structs for nested data
+   - Exploding nested structures
+   - Practical use cases for semi-structured data
+
 ## About pyspark.sql.functions (alias F)
 
 Many examples import pyspark.sql.functions and alias it as `F` (for example: `from pyspark.sql import functions as F`). This module provides essential SQL-style functions including:

@@ -13,6 +13,8 @@ DataEngineering/
 │   ├── 04_file_operations.py
 │   ├── 05_sql_queries.py
 │   ├── 06_structured_formats.py
+│   ├── 07_functions_library.py
+│   ├── 08_arrays_and_maps.py
 │   └── README.md
 └── README.md
 ```
@@ -29,6 +31,8 @@ A comprehensive collection of PySpark examples covering essential data processin
 - **04_file_operations.py** - Reading and writing data in CSV, JSON, and Parquet formats
 - **05_sql_queries.py** - Using Spark SQL for advanced querying and analysis
 - **06_structured_formats.py** - Reading nested JSON and partitioned Parquet with schema merging
+- **07_functions_library.py** - pyspark.sql.functions (F library) with comprehensive function categories
+- **08_arrays_and_maps.py** - Complex data types: arrays and maps for nested/semi-structured data
 
 Each example includes runnable code and detailed comments for learning purposes.
 
@@ -56,6 +60,8 @@ python 03_joins_and_unions.py
 python 04_file_operations.py
 python 05_sql_queries.py
 python 06_structured_formats.py
+python 07_functions_library.py
+python 08_arrays_and_maps.py
 ```
 
 ## Use Cases

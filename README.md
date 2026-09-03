@@ -1,4 +1,4 @@
-# DataEngineering
+DataEngineering
 
 A collection of data engineering projects, examples, and demonstrations.
 
@@ -6,19 +6,20 @@ A collection of data engineering projects, examples, and demonstrations.
 
 ```
 DataEngineering/
-├── pyspark_examples/      # PySpark examples and tutorials
+├── PySpark/            # PySpark examples and tutorials
 │   ├── 01_basic_setup.py
 │   ├── 02_data_operations.py
 │   ├── 03_joins_and_unions.py
 │   ├── 04_file_operations.py
 │   ├── 05_sql_queries.py
+│   ├── 06_structured_formats.py
 │   └── README.md
 └── README.md
 ```
 
 ## Contents
 
-### PySpark Examples (`pyspark_examples/`)
+### PySpark Examples (`PySpark/`)
 
 A comprehensive collection of PySpark examples covering essential data processing operations:
 
@@ -27,6 +28,7 @@ A comprehensive collection of PySpark examples covering essential data processin
 - **03_joins_and_unions.py** - Combining DataFrames using inner/left joins and unions
 - **04_file_operations.py** - Reading and writing data in CSV, JSON, and Parquet formats
 - **05_sql_queries.py** - Using Spark SQL for advanced querying and analysis
+- **06_structured_formats.py** - Reading nested JSON and partitioned Parquet with schema merging
 
 Each example includes runnable code and detailed comments for learning purposes.
 
@@ -44,15 +46,16 @@ pip install pyspark
 
 #### Running Examples
 
-Navigate to the `pyspark_examples/` directory and run any example:
+Navigate to the `PySpark/` directory and run any example:
 
 ```bash
-cd pyspark_examples
+cd PySpark
 python 01_basic_setup.py
 python 02_data_operations.py
 python 03_joins_and_unions.py
 python 04_file_operations.py
 python 05_sql_queries.py
+python 06_structured_formats.py
 ```
 
 ## Use Cases

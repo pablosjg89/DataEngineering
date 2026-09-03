@@ -77,6 +77,27 @@ print("\nFill null salaries with 0 and show sorted by Salary:")
 filled = null_df.na.fill({"Salary": 0})
 filled.orderBy(col("Salary").desc()).show()
 
+# --- Alternate null-handling APIs ---
+print("\nAlternate null-handling APIs:")
+# 1) Using where() with isNotNull()
+print("\nRows where Salary is not null (using where(...).isNotNull()):")
+df.where(col("Salary").isNotNull()).show()
+
+# 2) na.drop(how='all') - drops rows where ALL columns are null
+print("\nDrop rows where ALL columns are null (na.drop(how='all')):")
+all_nulls = [ (None, None, None), ("Hank", None, 45000) ]
+all_nulls_df = spark.createDataFrame(all_nulls, cols)
+all_nulls_df.show()
+all_nulls_df.na.drop(how="all").show()
+
+# 3) na.fill() for multiple columns
+print("\nFill nulls with defaults (na.fill) for multiple columns:")
+filled_multi = null_df.na.fill({"Department": "Unknown", "Salary": -1})
+filled_multi.show()
+
+print("\nAfter filling, sort by Salary to see defaulted rows at bottom:")
+filled_multi.sort(col("Salary").desc()).show()
+
 # Use case: sorting to create a deterministic leaderboard before export or reporting
 # Sorting provides deterministic order for downstream consumers and makes "top N" selection trivial.
 print("\nUse case - Leaderboard: Employees ordered by Salary (descending), Name ascending:")

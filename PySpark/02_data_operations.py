@@ -6,26 +6,6 @@ Examples of filtering, grouping, and aggregating data.
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, sum, avg, count, min, max
 
-# --- About pyspark.sql.functions (F library) ---
-# The 'functions' module provides SQL-like functions for DataFrame operations:
-# - Column expressions: col(), lit(), concat(), when(), etc.
-# - Aggregations: avg(), count(), sum(), min(), max(), etc.
-# - Window functions: row_number(), rank(), dense_rank(), etc.
-# - String operations: upper(), lower(), substring(), trim(), etc.
-# - Date/time functions: current_date(), date_add(), etc.
-#
-# Why use 'from pyspark.sql import functions as F'?
-# 1. Alias 'F' keeps code concise: F.avg('col') vs functions.avg('col')
-# 2. Avoids name conflicts with Python built-ins: F.sum() vs Python's sum()
-# 3. Makes it clear these are Spark functions, not Python stdlib
-# 4. Standard convention across PySpark community
-#
-# Common usage patterns:
-#   - Aggregations: df.groupBy("col").agg(F.avg("salary"), F.count("*"))
-#   - Transformations: df.withColumn("new_col", F.upper(F.col("name")))
-#   - Filtering: df.filter(F.col("salary") > 50000)
-#   - Conditional logic: df.select(F.when(F.col("age") > 18, "Adult").otherwise("Minor"))
-
 spark = SparkSession.builder \
     .appName("DataOperations") \
     .master("local[*]") \

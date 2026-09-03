@@ -148,8 +148,53 @@ more_emp_df = spark.createDataFrame(more_employees, emp_columns)
 
 # Union
 print("\n--- UNION ---")
-print("\nUnion of two employee DataFrames:")
+print("""
+UNION combines rows from two or more DataFrames INTO A SINGLE DataFrame.
+CRITICAL: Both DataFrames MUST have the SAME SCHEMA (same column names and types).
+
+Why schema must match:
+- Column names: Union expects columns in the same order
+- Data types: Each column must have matching types (Int, String, etc.)
+- Column count: Both DataFrames must have the same number of columns
+
+If schemas don't match: Use unionByName() instead, or select/rename columns first.
+""")
+
+print("\n--- Schema Validation ---")
+print("Employee DataFrame schema:")
+emp_df.printSchema()
+print("\nMore Employees DataFrame schema:")
+more_emp_df.printSchema()
+print("\n✓ Schemas match! Both have: (EmployeeID: int, Name: string, DepartmentID: int)")
+
+print("\n--- Simple Union (same schema) ---")
+print("\nUnion of two employee DataFrames (combining rows):")
 combined_df = emp_df.union(more_emp_df)
 combined_df.show()
+
+# Example showing what happens with different schemas
+print("\n--- Schema Mismatch Example (unionByName alternative) ---")
+diff_schema_data = [
+    ("Alice", 101, 80000),  # Different column order!
+    ("Bob", 102, 65000),
+]
+diff_schema_columns = ["Name", "DepartmentID", "Salary"]
+diff_df = spark.createDataFrame(diff_schema_data, diff_schema_columns)
+
+print("DataFrame with different schema (Name, DepartmentID, Salary):")
+diff_df.printSchema()
+
+print("\nAttempting union with different schema would fail or produce incorrect results.")
+print("Solution: Use unionByName() to match columns by name instead of position:")
+# This would work: combined_with_names = emp_df.select("EmployeeID", "Name", "DepartmentID").unionByName(diff_df.select("EmployeeID", "Name", "DepartmentID"))
+
+print("\n--- Union Use Cases ---")
+print("""
+Common scenarios for Union:
+1. Combining historical data with new records (same period format)
+2. Merging results from different queries (same fields)
+3. Aggregating data from multiple sources (standardized schemas)
+4. Appending batch data from multiple files with identical structure
+""")
 
 spark.stop()

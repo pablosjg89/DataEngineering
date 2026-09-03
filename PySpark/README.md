@@ -13,6 +13,8 @@ This directory contains a collection of PySpark examples for learning and refere
    - Filtering DataFrames
    - Grouping and aggregating data
    - Selecting specific columns
+   - Includes examples for where(), sort(), na.drop(), and na.fill() (null handling)
+   - Column operations: withColumn(), withColumnRenamed(), drop() (derived metrics, renaming, and pruning)
 
 3. **03_joins_and_unions.py** - Joins and Unions with PySpark
    - Inner joins between DataFrames
@@ -29,6 +31,10 @@ This directory contains a collection of PySpark examples for learning and refere
    - Running SQL queries on DataFrames
    - Aggregation and filtering using SQL
 
+6. **06_structured_formats.py** - Structured data formats (nested JSON, partitioned Parquet)
+   - Reading nested JSON and extracting fields
+   - Writing and reading partitioned Parquet with schema merging and partition filters
+
 ## Running the Examples
 
 To run any example (requires PySpark to be installed):
@@ -39,7 +45,16 @@ python 02_data_operations.py
 python 03_joins_and_unions.py
 python 04_file_operations.py
 python 05_sql_queries.py
+python 06_structured_formats.py
 ```
+
+## Notes
+
+- Examples use `local[*]` mode, which runs in local mode using all available cores
+- Log level is set to WARN to reduce output verbosity
+- Most examples use simple in-memory data for demonstration purposes
+- File operations use temporary directories for demo purposes
+- `02_data_operations.py` includes null-handling examples (na.drop, na.fill, where/isNotNull) and sorting examples (orderBy, sort)
 
 ## Requirements
 

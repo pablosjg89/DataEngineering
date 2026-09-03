@@ -108,6 +108,38 @@ leaderboard.show()
 print("\nTop 3 employees for a report:")
 leaderboard.limit(3).show()
 
+# Column operations: derived columns, renaming, and dropping
+print("\nColumn operations examples:")
+# 1) withColumn - create a derived metric (10% raise)
+print("\nAdd derived column 'SalaryAfterRaise' (10% raise):")
+with_raise = df.withColumn("SalaryAfterRaise", (col("Salary") * 1.10))
+with_raise.select("Name", "Salary", "SalaryAfterRaise").show()
+
+# 2) chain withColumn to create another transformed column
+print("\nAdd 'SalaryK' derived from SalaryAfterRaise (in thousands):")
+with_raise = with_raise.withColumn("SalaryK", (col("SalaryAfterRaise") / 1000))
+with_raise.select("Name", "SalaryAfterRaise", "SalaryK").show()
+
+# 3) withColumnRenamed - improve clarity
+print("\nRename 'Salary' to 'BaseSalary' for clarity:")
+renamed = df.withColumnRenamed("Salary", "BaseSalary")
+renamed.show()
+
+# 4) drop - remove redundant columns to focus dataset
+print("\nDrop 'Department' column to focus on salaries:")
+dropped = renamed.drop("Department")
+dropped.show()
+
+# 5) combined: compute derived, rename, and drop in a pipeline
+print("\nPipeline: compute, rename, and drop in one chain:")
+pipeline = (
+    df.withColumn("SalaryAfterRaise", col("Salary") * 1.10)
+      .withColumn("SalaryK", col("SalaryAfterRaise") / 1000)
+      .withColumnRenamed("Salary", "BaseSalary")
+      .drop("Department")
+)
+pipeline.show()
+
 # Group by and aggregate
 print("\nAverage salary by department:")
 df.groupBy("Department").agg(

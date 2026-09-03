@@ -24,7 +24,7 @@ DataEngineering/
 A comprehensive collection of PySpark examples covering essential data processing operations:
 
 - **01_basic_setup.py** - SparkSession initialization and basic DataFrame creation
-- **02_data_operations.py** - Filtering, grouping, and aggregating operations
+- **02_data_operations.py** - Filtering, grouping, and aggregating operations (includes where(), sort(), na.drop(), na.fill(), withColumn(), withColumnRenamed(), drop() examples)
 - **03_joins_and_unions.py** - Combining DataFrames using inner/left joins and unions
 - **04_file_operations.py** - Reading and writing data in CSV, JSON, and Parquet formats
 - **05_sql_queries.py** - Using Spark SQL for advanced querying and analysis

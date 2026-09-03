@@ -86,7 +86,7 @@ df.where(col("Salary").isNotNull()).show()
 # 2) na.drop(how='all') - drops rows where ALL columns are null
 print("\nDrop rows where ALL columns are null (na.drop(how='all')):")
 all_nulls = [ (None, None, None), ("Hank", None, 45000) ]
-all_nulls_df = spark.createDataFrame(all_nulls, cols)
+all_nulls_df = spark.createDataFrame(all_nulls, null_df.schema)
 all_nulls_df.show()
 all_nulls_df.na.drop(how="all").show()
 

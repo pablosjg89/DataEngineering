@@ -35,6 +35,20 @@ df.filter(col("Department") == "Engineering").show()
 print("\nEmployees with salary > 60000:")
 df.filter(col("Salary") > 60000).show()
 
+# Using where (alias of filter) with compound conditions
+print("\nEmployees with salary between 50000 and 80000:")
+df.where((col("Salary") >= 50000) & (col("Salary") <= 80000)).show()
+
+# Sorting examples (orderBy / sort)
+print("\nSort by Salary ascending:")
+df.orderBy(col("Salary").asc()).show()
+
+print("\nSort by Salary descending, then Name ascending:")
+df.orderBy(col("Salary").desc(), col("Name").asc()).show()
+
+print("\nTop 2 highest-paid employees:")
+df.orderBy(col("Salary").desc()).limit(2).show()
+
 # Group by and aggregate
 print("\nAverage salary by department:")
 df.groupBy("Department").agg(

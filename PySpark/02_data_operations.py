@@ -4,7 +4,7 @@ Examples of filtering, grouping, and aggregating data.
 """
 
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, sum, avg, count
+from pyspark.sql.functions import col, sum, avg, count, min, max
 
 # --- About pyspark.sql.functions (F library) ---
 # The 'functions' module provides SQL-like functions for DataFrame operations:
@@ -181,17 +181,16 @@ print("\nAggregations with ordering: average salary by department, descending:")
 df.groupBy("Department").agg(avg("Salary").alias("AvgSalary"), count("*").alias("Count")).orderBy(col("AvgSalary").desc()).show()
 
 print("\nGroup by with filter on aggregate (departments with avg salary > 60000):")
-from pyspark.sql import functions as F
-agg_df = df.groupBy("Department").agg(F.avg("Salary").alias("AvgSalary"), F.count("*").alias("Count"))
+agg_df = df.groupBy("Department").agg(avg("Salary").alias("AvgSalary"), count("*").alias("Count"))
 agg_df.filter(col("AvgSalary") > 60000).show()
 
 # Example: combined grouping with multiple aggregations and renaming
 print("\nDetailed department stats (avg, min, max, count):")
 df.groupBy("Department").agg(
-    F.avg("Salary").alias("AvgSalary"),
-    F.min("Salary").alias("MinSalary"),
-    F.max("Salary").alias("MaxSalary"),
-    F.count("*").alias("EmployeeCount")
+    avg("Salary").alias("AvgSalary"),
+    min("Salary").alias("MinSalary"),
+    max("Salary").alias("MaxSalary"),
+    count("*").alias("EmployeeCount")
 ).orderBy(col("AvgSalary").desc()).show()
 
 # Select specific columns

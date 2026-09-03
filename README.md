@@ -1,4 +1,4 @@
-# DataEngineering
+DataEngineering
 
 A collection of data engineering projects, examples, and demonstrations.
 
@@ -12,6 +12,7 @@ DataEngineering/
 │   ├── 03_joins_and_unions.py
 │   ├── 04_file_operations.py
 │   ├── 05_sql_queries.py
+│   ├── 06_structured_formats.py
 │   └── README.md
 └── README.md
 ```

@@ -35,6 +35,10 @@ This directory contains a collection of PySpark examples for learning and refere
    - Reading nested JSON and extracting fields
    - Writing and reading partitioned Parquet with schema merging and partition filters
 
+## About pyspark.sql.functions (alias F)
+
+Many examples import pyspark.sql.functions and alias it as `F` (for example: `from pyspark.sql import functions as F`). This module provides a rich set of SQL-style functions (avg, count, min, max, when, lit, col, concat, explode, etc.) that operate on Columns. Using the `F` alias keeps code concise and makes it clear these are built-in Spark functions (e.g., `F.avg('col')`). When writing multiple expressions or aggregations, prefer `F.*` to avoid name collisions and improve readability.
+
 ## Running the Examples
 
 To run any example (requires PySpark to be installed):

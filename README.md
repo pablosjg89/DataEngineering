@@ -67,6 +67,10 @@ These examples are ideal for:
 - Spark SQL query patterns
 - Data format handling (CSV, JSON, Parquet)
 
+## About pyspark.sql.functions (alias F)
+
+The module `pyspark.sql.functions` (commonly imported as `F`) provides a set of column expressions and utilities — avg, count, min, max, when, lit, col, concat, explode, and more — which are used throughout the examples for aggregations, expressions, and transformations. Using the `F` alias keeps expressions concise (e.g., `F.avg('Salary')`) and helps avoid naming conflicts with local variables.
+
 ## License
 
 This project is open source and available for learning and reference purposes.

@@ -1,7 +1,9 @@
 """
-UDFs and Pandas UDFs in PySpark
+PySpark UDFs and Pandas UDFs
 
-Regular (Python) UDFs:
+PySpark UDFs (regular, row-at-a-time UDFs):
+- Wrap a plain Python function with udf() (or register it with
+  spark.udf.register() for use in spark.sql() queries)
 - Operate one row at a time
 - Each row is serialized from the JVM to a Python worker process and back
 - Simple to write, but slow for large datasets due to per-row serialization overhead
@@ -9,14 +11,14 @@ Regular (Python) UDFs:
 Pandas UDFs (vectorized UDFs):
 - Operate on batches of rows as pandas Series/DataFrames, using Apache Arrow
   to transfer data between the JVM and Python in columnar batches
-- Much faster than regular UDFs because pandas/NumPy operations are vectorized
+- Much faster than PySpark UDFs because pandas/NumPy operations are vectorized
   and serialization overhead is amortized across a whole batch, not per row
 - Require pyarrow to be installed (bundled with pyspark-env)
 
 Rule of thumb: prefer built-in pyspark.sql.functions first (fastest, no
 serialization at all). Reach for a Pandas UDF when you need custom logic that
-functions can't express. Reach for a regular UDF only when Pandas UDFs don't
-fit the case (e.g. arbitrary per-row Python objects).
+functions can't express. Reach for a plain PySpark UDF only when Pandas UDFs
+don't fit the case (e.g. arbitrary per-row Python objects).
 """
 
 import pandas as pd
@@ -49,10 +51,10 @@ print("\nOriginal DataFrame:")
 df.show()
 
 # ============================================================================
-# SECTION 1: REGULAR (ROW-AT-A-TIME) UDF
+# SECTION 1: PYSPARK UDF (REGULAR, ROW-AT-A-TIME)
 # ============================================================================
 print("\n" + "=" * 80)
-print("1. REGULAR UDF - Operates on one row's value at a time")
+print("1. PYSPARK UDF - Operates on one row's value at a time")
 print("=" * 80)
 
 

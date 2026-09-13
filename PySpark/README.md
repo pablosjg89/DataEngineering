@@ -56,6 +56,10 @@ This directory contains a collection of PySpark examples for learning and refere
 
 9. **09_udfs_and_pandas_udfs.py** - PySpark UDFs and Pandas UDFs
    - PySpark UDFs (regular, row-at-a-time) with `udf()` and `spark.udf.register()`
+   - A multi-column UDF (several fields passed as separate arguments in one call)
+   - Why declaring the return type (`StringType()`, etc.) matters: Spark can't infer
+     it from a Python function running in a separate worker process, and a wrong or
+     missing type silently produces corrupted columns instead of an error
    - Scalar Pandas UDFs with `@pandas_udf` for vectorized, Arrow-backed transforms
    - Grouped-map Pandas UDFs with `applyInPandas()` for per-group pandas logic
    - When to reach for built-in functions vs. a PySpark UDF vs. a Pandas UDF

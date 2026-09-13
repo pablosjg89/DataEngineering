@@ -10,6 +10,13 @@ PySpark UDFs (regular, row-at-a-time UDFs):
 - Operate one row at a time
 - Each row is serialized from the JVM to a Python worker process and back
 - Simple to write, but slow for large datasets due to per-row serialization overhead
+- The return type (StringType(), DoubleType(), etc.) must be declared explicitly:
+  Spark runs the function in a separate Python process and has no way to
+  inspect its return type ahead of time the way it can for a native Catalyst
+  expression. Get it wrong (or omit it, which silently defaults to
+  StringType()) and you get corrupted columns or a confusing failure far from
+  the actual mistake, since Spark builds the DataFrame's schema around
+  whatever type you declared, not what the function actually returns.
 
 Pandas UDFs (vectorized UDFs):
 - Operate on batches of rows as pandas Series/DataFrames, using Apache Arrow
@@ -92,6 +99,26 @@ spark.sql("""
     SELECT Name, Salary, salary_bracket_sql(Salary) AS SalaryBracket
     FROM employees
 """).show()
+
+
+def employee_summary(name, department, salary):
+    # A UDF can take several columns as separate arguments, not just one
+    return f"{name} ({department}) earns ${salary:,}"
+
+
+# Declaring StringType() here is what tells Spark the output column's type.
+# The function above returns an f-string, so this is correct - but nothing
+# stops you from declaring, say, DoubleType() by mistake: Spark would still
+# run the function and build a column typed as double, producing nulls or
+# garbage instead of an error, because the mismatch only surfaces when a row
+# is actually read back and fails to parse as the declared type.
+employee_summary_udf = udf(employee_summary, StringType())
+
+print("\n--- udf() with multiple columns - Combine several fields in one call ---")
+print("One-line summary built from Name + Department + Salary:")
+df.select(
+    employee_summary_udf(col("Name"), col("Department"), col("Salary")).alias("Summary")
+).show(truncate=False)
 
 # ============================================================================
 # SECTION 2: PANDAS UDF (SCALAR) - Vectorized, batch-at-a-time

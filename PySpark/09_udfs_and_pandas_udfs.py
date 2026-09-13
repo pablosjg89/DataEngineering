@@ -2,8 +2,11 @@
 PySpark UDFs and Pandas UDFs
 
 PySpark UDFs (regular, row-at-a-time UDFs):
-- Wrap a plain Python function with udf() (or register it with
-  spark.udf.register() for use in spark.sql() queries)
+- Wrap a plain Python function with udf() and it's immediately usable in
+  DataFrame expressions across every node in the Spark session - Spark ships
+  the function to the executors for you, no registration needed. Registering
+  with spark.udf.register() is only required to call it from a spark.sql()
+  string query.
 - Operate one row at a time
 - Each row is serialized from the JVM to a Python worker process and back
 - Simple to write, but slow for large datasets due to per-row serialization overhead
@@ -16,9 +19,11 @@ Pandas UDFs (vectorized UDFs):
 - Require pyarrow to be installed (bundled with pyspark-env)
 
 Rule of thumb: prefer built-in pyspark.sql.functions first (fastest, no
-serialization at all). Reach for a Pandas UDF when you need custom logic that
-functions can't express. Reach for a plain PySpark UDF only when Pandas UDFs
-don't fit the case (e.g. arbitrary per-row Python objects).
+serialization at all). For bigger DataFrames, prefer a Pandas UDF - the
+vectorized, Arrow-backed execution scales much better than row-at-a-time
+calls. Reach for a plain PySpark UDF when convenience matters more than raw
+throughput (small/medium data, or logic that doesn't vectorize well), since
+it works immediately across the whole cluster with no extra setup.
 """
 
 import pandas as pd

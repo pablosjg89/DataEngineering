@@ -59,6 +59,9 @@ This directory contains a collection of PySpark examples for learning and refere
    - Scalar Pandas UDFs with `@pandas_udf` for vectorized, Arrow-backed transforms
    - Grouped-map Pandas UDFs with `applyInPandas()` for per-group pandas logic
    - When to reach for built-in functions vs. a PySpark UDF vs. a Pandas UDF
+   - Tradeoff: Pandas UDFs scale better on bigger DataFrames (vectorized, Arrow-backed);
+     PySpark UDFs are more convenient since `udf()` works across every node in the
+     Spark session immediately, with no registration step required
 
 ## About pyspark.sql.functions (alias F)
 

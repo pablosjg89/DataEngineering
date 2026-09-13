@@ -86,6 +86,19 @@ This directory contains a collection of PySpark examples for learning and refere
       to an RDD via `.rdd` and aggregated with `map()`/`reduceByKey()`
     - When to reach for the RDD API instead of DataFrames
 
+11. **11_spark_sql_advanced.py** - Spark SQL: Views, Catalog, Joins, Set Operations, Query Plans
+    - Builds on 05_sql_queries.py's basics with topics that one doesn't cover
+    - Local vs. global temp views (`createOrReplaceTempView()` vs
+      `createOrReplaceGlobalTempView()`) and how their visibility differs across
+      `SparkSession`s
+    - The `spark.catalog` API: `listTables()`, `listColumns()`, `tableExists()`
+    - SQL join types: `INNER`, `LEFT`, `RIGHT`, `FULL OUTER`, `LEFT SEMI`, `LEFT ANTI`
+    - Set operations: `UNION`, `UNION ALL`, `INTERSECT`, `EXCEPT`
+    - Multi-level aggregation: `ROLLUP`, `CUBE`, `GROUPING SETS`
+    - Reading a query's execution plan with `.explain()` - the Catalyst
+      optimization DataFrames/SQL get that RDDs don't
+    - Running SQL against a real dataset (`Datasets/melb_data.csv`)
+
 ## About pyspark.sql.functions (alias F)
 
 Many examples import pyspark.sql.functions and alias it as `F` (for example: `from pyspark.sql import functions as F`). This module provides essential SQL-style functions including:
@@ -116,6 +129,7 @@ python 07_functions_library.py
 python 08_arrays_and_maps.py
 python 09_udfs_and_pandas_udfs.py
 python 10_rdds.py
+python 11_spark_sql_advanced.py
 ```
 
 ## Notes

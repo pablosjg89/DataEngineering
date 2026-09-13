@@ -126,6 +126,20 @@ This directory contains a collection of PySpark examples for learning and refere
       `.groupBy()` per statistic (shown via `.explain()`'s single `Exchange`),
       prefer DataFrame/SQL over RDDs, and monitor plans with `.explain()`
 
+13. **13_pyspark_at_scale.py** - PySpark at Scale: Execution Plans, Caching, Broadcast Joins
+    - Reading `.explain()` in simple, extended (`True`), and formatted modes, and
+      spotting inefficiencies (shuffles, join strategies) in the plan
+    - Caching/persisting with `.cache()`/`.persist()`/`.unpersist()`, checking
+      `is_cached` and `storageLevel` before and after
+    - Persisting with different storage levels (`MEMORY_ONLY`, `MEMORY_AND_DISK`,
+      `DISK_ONLY`, ...) and the memory-vs-recompute-vs-replication tradeoff
+    - Broadcast joins: `broadcast()` turns a `SortMergeJoin` (shuffle on both
+      sides) into a `BroadcastHashJoin` (one `BroadcastExchange`, no shuffle of
+      the large side) - verified side-by-side on the real `melb_data.csv` dataset
+    - Best practices for optimizing PySpark jobs: favor targeted operations over
+      whole-dataset shuffles, use broadcast joins for small datasets, avoid
+      repeated actions on the same data, and read execution plans before scaling up
+
 ## About pyspark.sql.functions (alias F)
 
 Many examples import pyspark.sql.functions and alias it as `F` (for example: `from pyspark.sql import functions as F`). This module provides essential SQL-style functions including:
@@ -158,6 +172,7 @@ python 09_udfs_and_pandas_udfs.py
 python 10_rdds.py
 python 11_spark_sql_advanced.py
 python 12_combining_dataframe_and_sql.py
+python 13_pyspark_at_scale.py
 ```
 
 ## Notes

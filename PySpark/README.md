@@ -121,6 +121,10 @@ This directory contains a collection of PySpark examples for learning and refere
     - RDDs for aggregations: the same SUM/AVG done with a custom lambda via
       `rdd.map()` + `reduceByKey()`, contrasted with the one-line DataFrame/SQL
       `GROUP BY` that produces the identical result
+    - Best practices for PySpark aggregations: filter early, validate/standardize
+      types first, combine statistics into one `.agg()` call instead of one
+      `.groupBy()` per statistic (shown via `.explain()`'s single `Exchange`),
+      prefer DataFrame/SQL over RDDs, and monitor plans with `.explain()`
 
 ## About pyspark.sql.functions (alias F)
 

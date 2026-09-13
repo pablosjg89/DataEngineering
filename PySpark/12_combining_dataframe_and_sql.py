@@ -27,12 +27,13 @@ Covers:
 - RDDs for aggregations: the same SUM/AVG done with a custom lambda via
   rdd.map() + reduceByKey(), contrasted with the one-line DataFrame/SQL
   GROUP BY that does the same thing
+- Best practices for PySpark aggregations, tying the above together
 """
 
 import os
 
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, expr, sum as spark_sum
+from pyspark.sql.functions import col, expr, sum as spark_sum, avg, count
 
 spark = SparkSession.builder \
     .appName("CombiningDataFrameAndSQL") \
@@ -284,6 +285,54 @@ for department, (total_salary, avg_salary) in sorted(dept_agg_rdd.collect()):
 
 print("\nSame result either way - but the RDD version took two custom lambdas and")
 print("three chained transformations to express what SQL said in one GROUP BY.")
+
+# ============================================================================
+# SECTION 9: BEST PRACTICES FOR PYSPARK AGGREGATIONS
+# ============================================================================
+print("\n" + "=" * 80)
+print("9. BEST PRACTICES FOR PYSPARK AGGREGATIONS")
+print("=" * 80)
+
+print("""
+1. Filter early - reduce the data size before aggregating, not after. Section
+   6's pipeline filtered melb_data.csv down to rows with a Price and Rooms
+   BEFORE grouping by Suburb, so the aggregation's shuffle only ever moved
+   the rows that actually mattered.
+
+2. Ensure data is clean and correctly typed - see Section 7: a numeric column
+   stored as a string can break sum()/avg() outright, or silently corrupt
+   the result. Validate and standardize types (cast()/try_cast()) first.
+
+3. Minimize the number of separate aggregation passes - every .groupBy() that
+   feeds an action is its own shuffle. Combine multiple statistics into one
+   .agg() call instead of running .groupBy() again per statistic (below).
+
+4. Choose the right API - prefer the DataFrame API/SQL over RDDs for
+   aggregations in most cases (Section 8): DataFrames get the
+   Catalyst/Tungsten optimizer that RDDs don't, with far less code.
+
+5. Monitor performance with .explain() - inspect the physical plan (as
+   Section 6 did) to check for avoidable shuffles (Exchange) or missing
+   filter pushdown, and adjust the query accordingly.
+""")
+
+print("--- Practice #3 in action: one combined .agg() vs. three separate groupBy() calls ---")
+
+print("Three separate groupBy() calls - each .show() triggers its own job and its own shuffle:")
+employees_df.groupBy("Department").sum("Salary").show()
+employees_df.groupBy("Department").avg("Salary").show()
+employees_df.groupBy("Department").count().show()
+
+print("One combined .agg() call - a single groupBy(), a single shuffle, for all three statistics:")
+combined_stats_df = employees_df.groupBy("Department").agg(
+    spark_sum("Salary").alias("TotalSalary"),
+    avg("Salary").alias("AvgSalary"),
+    count("*").alias("HeadCount")
+)
+combined_stats_df.show()
+
+print("Its plan has exactly one Exchange (shuffle) for all three statistics combined:")
+combined_stats_df.explain()
 
 print("\n" + "=" * 80)
 print("END OF COMBINING DATAFRAME AND SQL OPERATIONS EXAMPLES")

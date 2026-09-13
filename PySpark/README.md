@@ -70,6 +70,16 @@ This directory contains a collection of PySpark examples for learning and refere
      PySpark UDFs are more convenient since `udf()` works across every node in the
      Spark session immediately, with no registration step required
 
+10. **10_rdds.py** - RDDs (Resilient Distributed Datasets)
+    - Creating RDDs with `sc.parallelize()` and inspecting partitions
+    - Transformations: `map()`, `filter()`, `flatMap()`, `distinct()`
+    - Actions: `collect()`, `count()`, `first()`, `take()`, `reduce()`
+    - Pair RDD operations: `reduceByKey()`, `groupByKey()`, `mapValues()`, `sortByKey()`
+    - Set-like operations: `union()`, `intersection()`, `subtract()`
+    - Persistence with `cache()` / `unpersist()` to avoid recomputing an RDD
+    - Converting between RDDs and DataFrames with `toDF()` and `df.rdd`
+    - When to reach for the RDD API instead of DataFrames
+
 ## About pyspark.sql.functions (alias F)
 
 Many examples import pyspark.sql.functions and alias it as `F` (for example: `from pyspark.sql import functions as F`). This module provides essential SQL-style functions including:
@@ -99,6 +109,7 @@ python 06_structured_formats.py
 python 07_functions_library.py
 python 08_arrays_and_maps.py
 python 09_udfs_and_pandas_udfs.py
+python 10_rdds.py
 ```
 
 ## Notes

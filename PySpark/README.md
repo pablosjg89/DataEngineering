@@ -60,6 +60,9 @@ This directory contains a collection of PySpark examples for learning and refere
    - Why declaring the return type (`StringType()`, etc.) matters: Spark can't infer
      it from a Python function running in a separate worker process, and a wrong or
      missing type silently produces corrupted columns instead of an error
+   - A UDF returning several different types at once via a `StructType` schema
+     (a tuple of `(str, float, bool)` mapped to `StringType`/`DoubleType`/`BooleanType`
+     fields) - `udf()` always takes exactly one `returnType`, never several positional ones
    - Scalar Pandas UDFs with `@pandas_udf` for vectorized, Arrow-backed transforms
    - Grouped-map Pandas UDFs with `applyInPandas()` for per-group pandas logic
    - When to reach for built-in functions vs. a PySpark UDF vs. a Pandas UDF

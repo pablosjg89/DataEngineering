@@ -36,7 +36,7 @@ it works immediately across the whole cluster with no extra setup.
 import pandas as pd
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, udf, pandas_udf
-from pyspark.sql.types import DoubleType, StringType
+from pyspark.sql.types import DoubleType, StringType, BooleanType, StructType, StructField
 
 spark = SparkSession.builder \
     .appName("UDFsAndPandasUDFs") \
@@ -119,6 +119,34 @@ print("One-line summary built from Name + Department + Salary:")
 df.select(
     employee_summary_udf(col("Name"), col("Department"), col("Salary")).alias("Summary")
 ).show(truncate=False)
+
+# udf() only ever takes ONE returnType - there's no such thing as
+# udf(func, StringType(), DoubleType(), BooleanType()). To get several
+# differently-typed values out of a single UDF call, the function returns a
+# tuple and the returnType is a StructType describing each field's name and
+# type, in the same order as the tuple.
+employee_profile_schema = StructType([
+    StructField("Summary", StringType()),
+    StructField("Bonus", DoubleType()),
+    StructField("IsHighEarner", BooleanType()),
+])
+
+
+def employee_profile(name, department, salary):
+    summary = f"{name} ({department})"
+    bonus = round(salary * 0.10, 2)
+    is_high_earner = salary >= 75000
+    return (summary, bonus, is_high_earner)
+
+
+employee_profile_udf = udf(employee_profile, employee_profile_schema)
+
+print("\n--- udf() with a StructType return - Multiple output types from one call ---")
+print("Summary (string) + Bonus (double) + IsHighEarner (boolean) in a single UDF:")
+df.select(
+    col("Name"),
+    employee_profile_udf(col("Name"), col("Department"), col("Salary")).alias("Profile")
+).select("Name", "Profile.*").show(truncate=False)
 
 # ============================================================================
 # SECTION 2: PANDAS UDF (SCALAR) - Vectorized, batch-at-a-time

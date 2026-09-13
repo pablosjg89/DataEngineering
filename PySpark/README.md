@@ -114,6 +114,10 @@ This directory contains a collection of PySpark examples for learning and refere
     - `selectExpr()` - `select()` shorthand using SQL-like expression strings
     - A multi-step pipeline on the real `Datasets/melb_data.csv` dataset that hops
       between DataFrame API and SQL, using whichever is more readable at each step
+    - Type safety before aggregating: `sum()`/`cast()` on a malformed numeric
+      string raises in this Spark build (ANSI mode), while `try_cast()` (via
+      `expr()`) converts what it can and returns `NULL` for the rest, so bad
+      rows can be found and excluded before they reach the aggregation
 
 ## About pyspark.sql.functions (alias F)
 

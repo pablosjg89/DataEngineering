@@ -20,12 +20,16 @@ Covers:
 - expr() - embed a SQL expression inside a DataFrame API call
 - selectExpr() - a select() shorthand using SQL-like expression strings
 - A multi-step pipeline on a real dataset that hops between both APIs
+- Why validating/standardizing types before aggregating matters: a numeric
+  column that arrives as a string (a common CSV/JSON ingestion problem) can
+  break sum()/avg() outright, or - handled carelessly - silently corrupt
+  results. cast() and try_cast() are how you standardize and validate first.
 """
 
 import os
 
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, expr
+from pyspark.sql.functions import col, expr, sum as spark_sum
 
 spark = SparkSession.builder \
     .appName("CombiningDataFrameAndSQL") \
@@ -179,6 +183,56 @@ suburb_stats_df = spark.sql("""
 # express as a DataFrame API chain than to fold into the SQL above
 print("Step 3 (DataFrame API): sort the SQL result and take the top 5 by AvgPricePerRoom")
 suburb_stats_df.orderBy(col("AvgPricePerRoom").desc()).limit(5).show()
+
+# ============================================================================
+# SECTION 7: TYPE SAFETY BEFORE AGGREGATING - cast() and try_cast()
+# ============================================================================
+print("\n" + "=" * 80)
+print("7. TYPE SAFETY BEFORE AGGREGATING - cast() and try_cast()")
+print("=" * 80)
+
+print("""
+Numeric data that arrives as a string (a common CSV/JSON ingestion problem)
+can break an aggregation outright, or silently corrupt it if handled
+carelessly. Always validate and standardize a column's type before
+aggregating it - this protects the pipeline from costly errors downstream.
+""")
+
+salary_strings_df = spark.createDataFrame([
+    ("Alice", "Engineering", "95000"),
+    ("Bob", "Sales", "55000"),
+    ("Charlie", "Engineering", "70,000"),  # thousands separator - not a valid number
+    ("Diana", "Sales", "85000"),
+    ("Eve", "HR", "N/A"),                   # not numeric at all
+], ["Name", "Department", "Salary"])  # Salary is inferred as StringType, not numeric
+
+print("--- Salary is a string column - the schema shows no numeric type ---")
+salary_strings_df.printSchema()
+
+print("--- sum() straight on the string column blows up (this Spark build runs in ANSI mode) ---")
+try:
+    salary_strings_df.groupBy("Department").agg(spark_sum("Salary").alias("TotalSalary")).show()
+except Exception as e:
+    print(f"  FAILED: {type(e).__name__}: {str(e).splitlines()[0]}")
+
+print("\n--- cast() to a numeric type also raises on the first malformed value it hits ---")
+try:
+    salary_strings_df.withColumn("SalaryNum", col("Salary").cast("double")).show()
+except Exception as e:
+    print(f"  FAILED: {type(e).__name__}: {str(e).splitlines()[0]}")
+
+print("\n--- try_cast() converts what it can and returns NULL for the rest, instead of failing ---")
+validated_df = salary_strings_df.withColumn("SalaryNum", expr("try_cast(Salary AS DOUBLE)"))
+validated_df.show()
+
+print("--- Inspect exactly which rows failed to convert, before they can corrupt an aggregate ---")
+validated_df.filter(col("SalaryNum").isNull()).show()
+
+print("--- Now the aggregation runs cleanly on the validated, standardized rows ---")
+validated_df.filter(col("SalaryNum").isNotNull()) \
+    .groupBy("Department") \
+    .agg(spark_sum("SalaryNum").alias("TotalSalary")) \
+    .show()
 
 print("\n" + "=" * 80)
 print("END OF COMBINING DATAFRAME AND SQL OPERATIONS EXAMPLES")

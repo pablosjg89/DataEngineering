@@ -118,6 +118,9 @@ This directory contains a collection of PySpark examples for learning and refere
       string raises in this Spark build (ANSI mode), while `try_cast()` (via
       `expr()`) converts what it can and returns `NULL` for the rest, so bad
       rows can be found and excluded before they reach the aggregation
+    - RDDs for aggregations: the same SUM/AVG done with a custom lambda via
+      `rdd.map()` + `reduceByKey()`, contrasted with the one-line DataFrame/SQL
+      `GROUP BY` that produces the identical result
 
 ## About pyspark.sql.functions (alias F)
 

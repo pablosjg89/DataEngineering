@@ -24,6 +24,9 @@ Covers:
   column that arrives as a string (a common CSV/JSON ingestion problem) can
   break sum()/avg() outright, or - handled carelessly - silently corrupt
   results. cast() and try_cast() are how you standardize and validate first.
+- RDDs for aggregations: the same SUM/AVG done with a custom lambda via
+  rdd.map() + reduceByKey(), contrasted with the one-line DataFrame/SQL
+  GROUP BY that does the same thing
 """
 
 import os
@@ -233,6 +236,54 @@ validated_df.filter(col("SalaryNum").isNotNull()) \
     .groupBy("Department") \
     .agg(spark_sum("SalaryNum").alias("TotalSalary")) \
     .show()
+
+# ============================================================================
+# SECTION 8: RDDs FOR AGGREGATIONS - Comparing verbosity with DataFrame/SQL
+# ============================================================================
+print("\n" + "=" * 80)
+print("8. RDDs FOR AGGREGATIONS - The same SUM/AVG, RDD vs. DataFrame/SQL")
+print("=" * 80)
+
+print("""
+DataFrames/SQL are the preferred choice for most PySpark analytics - SUM()
+and AVG() are one line via spark.sql() or the DataFrame API. RDDs have no
+built-in aggregation functions like that: getting the same result takes a
+custom lambda applied with rdd.map(), then reduceByKey() to combine the
+per-row results by key - several lines and a hand-written function instead
+of a single GROUP BY.
+""")
+
+print("--- DataFrame/SQL: total and average salary per department, one line ---")
+spark.sql("""
+    SELECT Department, SUM(Salary) AS TotalSalary, AVG(Salary) AS AvgSalary
+    FROM employees
+    GROUP BY Department
+    ORDER BY Department
+""").show()
+
+print("--- RDD: the same result, via a custom lambda with map() + reduceByKey() ---")
+employees_rdd = employees_df.rdd
+
+# map() turns each Row into (Department, (Salary, 1)) - the "1" is a running
+# count so reduceByKey() can total both the salary and the number of rows
+dept_salary_pairs_rdd = employees_rdd.map(lambda row: (row.Department, (row.Salary, 1)))
+
+# reduceByKey() applies that lambda across the whole RDD, combining pairs
+# that share a key: sum the salaries, sum the counts
+dept_totals_rdd = dept_salary_pairs_rdd.reduceByKey(
+    lambda a, b: (a[0] + b[0], a[1] + b[1])
+)
+
+# A second lambda turns (TotalSalary, Count) into (TotalSalary, AvgSalary)
+dept_agg_rdd = dept_totals_rdd.mapValues(
+    lambda total_count: (total_count[0], round(total_count[0] / total_count[1], 2))
+)
+
+for department, (total_salary, avg_salary) in sorted(dept_agg_rdd.collect()):
+    print(f"  {department}: TotalSalary={total_salary}, AvgSalary={avg_salary}")
+
+print("\nSame result either way - but the RDD version took two custom lambdas and")
+print("three chained transformations to express what SQL said in one GROUP BY.")
 
 print("\n" + "=" * 80)
 print("END OF COMBINING DATAFRAME AND SQL OPERATIONS EXAMPLES")

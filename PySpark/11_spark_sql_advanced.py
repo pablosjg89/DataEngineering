@@ -10,12 +10,15 @@ window functions, CTEs, subqueries). This file covers what that one doesn't:
 - Multi-level aggregation with ROLLUP/CUBE/GROUPING SETS
 - Reading a query's execution plan with .explain(), to see the
   Catalyst/Tungsten optimizations DataFrames get that RDDs don't
-- Running SQL against a real CSV dataset
+- Running SQL against a real CSV dataset, then adding a calculated column to
+  the query result with withColumn() - a spark.sql() result is just a
+  DataFrame, so the DataFrame API keeps working on it
 """
 
 import os
 
 from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
 
 spark = SparkSession.builder \
     .appName("SparkSQLAdvanced") \
@@ -32,7 +35,10 @@ employees = [
     ("Eve", "HR", "Senior", 60000),
     ("Frank", "Engineering", "Senior", 100000),
 ]
-employees_df = spark.createDataFrame(employees, ["Name", "Department", "Level", "Salary"])
+
+employee_columns = ["Name", "Department", "Level", "Salary"]
+employees_df = spark.createDataFrame(employees, schema=employee_columns)
+
 
 # Grace isn't in `employees` and Diana/Eve/Frank have no project - good for
 # demonstrating unmatched rows in outer/semi/anti joins
@@ -42,7 +48,9 @@ projects = [
     ("Charlie", "Recommendation Engine"),
     ("Grace", "Mobile App"),
 ]
-projects_df = spark.createDataFrame(projects, ["Name", "Project"])
+
+project_cols = ["Name", "Project"]
+projects_df = spark.createDataFrame(projects, schema=project_cols)
 
 print("=" * 80)
 print("SPARK SQL - VIEWS, CATALOG, JOINS, SET OPERATIONS, QUERY PLANS")
@@ -260,6 +268,23 @@ spark.sql("""
     ORDER BY AvgPrice DESC
     LIMIT 5
 """).show(truncate=False)
+
+print("\n--- withColumn() - Take a SQL query result and add a calculated column ---")
+print("Query the 5 most expensive listings, then compute Price per Room with withColumn():")
+top_listings_df = spark.sql("""
+    SELECT Suburb, Rooms, Price
+    FROM melbourne_housing
+    WHERE Price IS NOT NULL AND Rooms IS NOT NULL AND Rooms > 0
+    ORDER BY Price DESC
+    LIMIT 5
+""")
+# withColumn()'s calculation reads two columns that came straight out of the
+# SQL query above (Price, Rooms) - the SQL result is just a DataFrame, so the
+# DataFrame API (withColumn, F.col, ...) keeps working on it like any other
+top_listings_with_ratio_df = top_listings_df.withColumn(
+    "PricePerRoom", F.round(F.col("Price") / F.col("Rooms"), 2)
+)
+top_listings_with_ratio_df.show()
 
 print("\n" + "=" * 80)
 print("END OF SPARK SQL ADVANCED EXAMPLES")

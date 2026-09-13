@@ -38,7 +38,7 @@ A comprehensive collection of PySpark examples covering essential data processin
 - **08_arrays_and_maps.py** - Complex data types: arrays and maps for nested/semi-structured data
 - **09_udfs_and_pandas_udfs.py** - PySpark UDFs (`udf()`, `spark.udf.register()`, multi-column and `StructType` return types) vs. Pandas UDFs (`@pandas_udf`, `applyInPandas()`), and when to reach for each
 - **10_rdds.py** - RDDs vs. DataFrames, plus RDD creation, transformations (`map`, `filter`, `flatMap`, `distinct`), actions (`collect`, `count`, `reduce`), pair RDD operations (`reduceByKey`, `groupByKey`), set operations, persistence, and converting to/from DataFrames (including a real CSV dataset via `spark.read.csv()`)
-- **11_spark_sql_advanced.py** - Spark SQL beyond the basics: local vs. global temp views, the `spark.catalog` API, SQL join types (including `SEMI`/`ANTI`), set operations (`UNION`/`INTERSECT`/`EXCEPT`), multi-level aggregation (`ROLLUP`/`CUBE`/`GROUPING SETS`), reading query plans with `.explain()`, and querying a real dataset with SQL
+- **11_spark_sql_advanced.py** - Spark SQL beyond the basics: local vs. global temp views, the `spark.catalog` API, SQL join types (including `SEMI`/`ANTI`), set operations (`UNION`/`INTERSECT`/`EXCEPT`), multi-level aggregation (`ROLLUP`/`CUBE`/`GROUPING SETS`), reading query plans with `.explain()`, querying a real dataset with SQL, and adding a calculated column to a SQL result with `withColumn()`
 
 Each example includes runnable code and detailed comments for learning purposes.
 

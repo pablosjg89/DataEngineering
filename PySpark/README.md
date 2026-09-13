@@ -98,6 +98,9 @@ This directory contains a collection of PySpark examples for learning and refere
     - Reading a query's execution plan with `.explain()` - the Catalyst
       optimization DataFrames/SQL get that RDDs don't
     - Running SQL against a real dataset (`Datasets/melb_data.csv`)
+    - Adding a calculated column to a SQL query result with `withColumn()` (e.g.
+      Price per Room from queried `Price`/`Rooms` columns) - a `spark.sql()`
+      result is just a DataFrame, so the DataFrame API keeps working on it
 
 ## About pyspark.sql.functions (alias F)
 

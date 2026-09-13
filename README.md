@@ -19,6 +19,7 @@ DataEngineering/
 │   ├── 10_rdds.py
 │   ├── 11_spark_sql_advanced.py
 │   ├── 12_combining_dataframe_and_sql.py
+│   ├── 13_pyspark_at_scale.py
 │   └── README.md
 └── README.md
 ```
@@ -41,6 +42,7 @@ A comprehensive collection of PySpark examples covering essential data processin
 - **10_rdds.py** - RDDs vs. DataFrames, plus RDD creation, transformations (`map`, `filter`, `flatMap`, `distinct`), actions (`collect`, `count`, `reduce`), pair RDD operations (`reduceByKey`, `groupByKey`), set operations, persistence, and converting to/from DataFrames (including a real CSV dataset via `spark.read.csv()`)
 - **11_spark_sql_advanced.py** - Spark SQL beyond the basics: local vs. global temp views, the `spark.catalog` API, SQL join types (including `SEMI`/`ANTI`), set operations (`UNION`/`INTERSECT`/`EXCEPT`), multi-level aggregation (`ROLLUP`/`CUBE`/`GROUPING SETS`), reading query plans with `.explain()`, querying a real dataset with SQL, and adding a calculated column to a SQL result with `withColumn()`
 - **12_combining_dataframe_and_sql.py** - Proof the DataFrame API and SQL produce identical Catalyst plans, freely hopping between them (DataFrame -> SQL via temp views, SQL -> DataFrame via chained methods), `expr()`/`selectExpr()` for SQL expressions inside the DataFrame API, a multi-step real-dataset pipeline mixing both, why validating types with `cast()`/`try_cast()` before aggregating protects a pipeline from errors or silently wrong results, RDDs vs. DataFrame/SQL verbosity for the same SUM/AVG aggregation, and a best-practices summary for PySpark aggregations
+- **13_pyspark_at_scale.py** - Reading `.explain()` plans (simple/extended/formatted) to spot shuffles and join strategies, caching/persisting with `.cache()`/`.persist()`/`.unpersist()` and different storage levels, broadcast joins (`broadcast()`) to replace a shuffle `SortMergeJoin` with a `BroadcastHashJoin`, and best practices for optimizing PySpark jobs at scale
 
 Each example includes runnable code and detailed comments for learning purposes.
 
@@ -74,6 +76,7 @@ python 09_udfs_and_pandas_udfs.py
 python 10_rdds.py
 python 11_spark_sql_advanced.py
 python 12_combining_dataframe_and_sql.py
+python 13_pyspark_at_scale.py
 ```
 
 ## Use Cases

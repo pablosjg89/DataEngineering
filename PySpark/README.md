@@ -102,6 +102,30 @@ This directory contains a collection of PySpark examples for learning and refere
       Price per Room from queried `Price`/`Rooms` columns) - a `spark.sql()`
       result is just a DataFrame, so the DataFrame API keeps working on it
 
+12. **12_combining_dataframe_and_sql.py** - Combining DataFrame and SQL Operations
+    - Proof the two APIs are interchangeable: an equivalent DataFrame-API query and
+      SQL query produce the identical Catalyst physical plan
+    - DataFrame -> SQL: build/filter with the DataFrame API, then query the result
+      with plain SQL after registering it as a temp view
+    - SQL -> DataFrame: take a `spark.sql()` result and keep transforming it with
+      `select()`/`filter()`/`withColumn()`/`groupBy()`
+    - `expr()` - embed a SQL expression (comparisons, `CASE WHEN`) as a `Column`
+      inside a DataFrame API call
+    - `selectExpr()` - `select()` shorthand using SQL-like expression strings
+    - A multi-step pipeline on the real `Datasets/melb_data.csv` dataset that hops
+      between DataFrame API and SQL, using whichever is more readable at each step
+    - Type safety before aggregating: `sum()`/`cast()` on a malformed numeric
+      string raises in this Spark build (ANSI mode), while `try_cast()` (via
+      `expr()`) converts what it can and returns `NULL` for the rest, so bad
+      rows can be found and excluded before they reach the aggregation
+    - RDDs for aggregations: the same SUM/AVG done with a custom lambda via
+      `rdd.map()` + `reduceByKey()`, contrasted with the one-line DataFrame/SQL
+      `GROUP BY` that produces the identical result
+    - Best practices for PySpark aggregations: filter early, validate/standardize
+      types first, combine statistics into one `.agg()` call instead of one
+      `.groupBy()` per statistic (shown via `.explain()`'s single `Exchange`),
+      prefer DataFrame/SQL over RDDs, and monitor plans with `.explain()`
+
 ## About pyspark.sql.functions (alias F)
 
 Many examples import pyspark.sql.functions and alias it as `F` (for example: `from pyspark.sql import functions as F`). This module provides essential SQL-style functions including:
@@ -133,6 +157,7 @@ python 08_arrays_and_maps.py
 python 09_udfs_and_pandas_udfs.py
 python 10_rdds.py
 python 11_spark_sql_advanced.py
+python 12_combining_dataframe_and_sql.py
 ```
 
 ## Notes

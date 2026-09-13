@@ -7,6 +7,26 @@ across the cluster. DataFrames are built on top of RDDs and add a schema
 plus the Catalyst/Tungsten query optimizer, which is why DataFrames are
 almost always preferred today.
 
+DataFrames vs. RDDs:
+- RDDs offer a low-level interface, giving maximum flexibility - you can
+  manipulate data at a granular level, but that flexibility costs more lines
+  of code for even moderately complex operations.
+- RDDs preserve Python data types across operations, but lack the
+  schema-aware optimizations DataFrames get from Catalyst/Tungsten, so
+  operations on structured data are both less efficient and harder to
+  express.
+- RDDs scale to large datasets, but aren't as optimized for analytics
+  workloads as DataFrames are.
+- DataFrames are optimized for ease of use: a high-level abstraction that
+  encapsulates complex computations, so the same goal takes less code and
+  fewer opportunities for mistakes.
+- DataFrames' standout feature is SQL-like functionality - complex
+  transformations and analyses expressed in a few lines via SQL syntax or
+  the DataFrame API.
+- DataFrames carry built-in schema awareness (column names and data types),
+  just like a structured table in SQL; RDDs carry none of that - just
+  whatever Python objects you put into them.
+
 Reach for RDDs when you need:
 - Fine-grained control over partitioning or low-level transformations
 - To process unstructured data that doesn't fit a DataFrame schema well
@@ -19,6 +39,8 @@ Two kinds of RDD operations:
 - Actions (collect, count, reduce, ...) trigger actual execution and return
   a result to the driver
 """
+
+import os
 
 from pyspark.sql import SparkSession
 
@@ -179,6 +201,29 @@ dept_totals_df.orderBy("Department").show()
 print("\n--- df.rdd - Drop back down to the underlying RDD of Row objects ---")
 rows = dept_totals_df.rdd.map(lambda row: (row.Department, row.TotalSalary)).collect()
 print(f"Back to plain tuples: {sorted(rows)}")
+
+print("\n--- spark.read.csv() + .rdd - Convert a real dataset to an RDD ---")
+dataset_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Datasets", "melb_data.csv")
+melb_df = spark.read.csv(dataset_path, header=True, inferSchema=True)
+melb_rdd = melb_df.rdd  # DataFrame -> RDD of Row objects, one Row per CSV record
+
+print(f"Melbourne housing dataset: {melb_rdd.count()} rows")
+# Prefer collect() over take()/first() on an RDD converted straight from a
+# DataFrame: on some local Windows setups, take()/first()'s incremental
+# partition-scanning strategy crashes the Python worker for this kind of RDD,
+# while count()/collect()/reduceByKey() go through a different, more stable
+# code path. limit(1) narrows it down on the DataFrame side first, so the
+# .rdd conversion and collect() below only ever touch a single row.
+print(f"First row as a Row object: {melb_df.limit(1).rdd.collect()[0]}")
+
+print("\nAverage price for the first 5 suburbs (alphabetically), computed with plain RDD ops:")
+suburb_price_rdd = melb_rdd.map(lambda row: (row.Suburb, row.Price)) \
+    .filter(lambda kv: kv[1] is not None)
+suburb_sum_count_rdd = suburb_price_rdd.mapValues(lambda price: (price, 1)) \
+    .reduceByKey(lambda a, b: (a[0] + b[0], a[1] + b[1]))
+suburb_avg_rdd = suburb_sum_count_rdd.mapValues(lambda sum_count: round(sum_count[0] / sum_count[1], 2))
+for suburb, avg_price in suburb_avg_rdd.sortByKey().collect()[:5]:
+    print(f"  {suburb}: ${avg_price:,}")
 
 print("\n" + "=" * 80)
 print("END OF PYSPARK RDDs EXAMPLES")

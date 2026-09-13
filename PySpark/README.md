@@ -71,6 +71,10 @@ This directory contains a collection of PySpark examples for learning and refere
      Spark session immediately, with no registration step required
 
 10. **10_rdds.py** - RDDs (Resilient Distributed Datasets)
+    - DataFrames vs. RDDs: RDDs give maximum low-level flexibility (and preserve
+      Python data types) at the cost of more code and no Catalyst/Tungsten
+      optimizations; DataFrames trade some of that flexibility for a schema-aware,
+      SQL-like high-level API that does more with less code
     - Creating RDDs with `sc.parallelize()` and inspecting partitions
     - Transformations: `map()`, `filter()`, `flatMap()`, `distinct()`
     - Actions: `collect()`, `count()`, `first()`, `take()`, `reduce()`
@@ -78,6 +82,8 @@ This directory contains a collection of PySpark examples for learning and refere
     - Set-like operations: `union()`, `intersection()`, `subtract()`
     - Persistence with `cache()` / `unpersist()` to avoid recomputing an RDD
     - Converting between RDDs and DataFrames with `toDF()` and `df.rdd`
+    - Real-dataset example: `spark.read.csv()` on `Datasets/melb_data.csv`, converted
+      to an RDD via `.rdd` and aggregated with `map()`/`reduceByKey()`
     - When to reach for the RDD API instead of DataFrames
 
 ## About pyspark.sql.functions (alias F)

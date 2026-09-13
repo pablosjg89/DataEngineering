@@ -36,7 +36,7 @@ A comprehensive collection of PySpark examples covering essential data processin
 - **07_functions_library.py** - pyspark.sql.functions (F library) with comprehensive function categories
 - **08_arrays_and_maps.py** - Complex data types: arrays and maps for nested/semi-structured data
 - **09_udfs_and_pandas_udfs.py** - PySpark UDFs (`udf()`, `spark.udf.register()`, multi-column and `StructType` return types) vs. Pandas UDFs (`@pandas_udf`, `applyInPandas()`), and when to reach for each
-- **10_rdds.py** - RDDs: creation, transformations (`map`, `filter`, `flatMap`, `distinct`), actions (`collect`, `count`, `reduce`), pair RDD operations (`reduceByKey`, `groupByKey`), set operations, persistence, and converting to/from DataFrames
+- **10_rdds.py** - RDDs vs. DataFrames, plus RDD creation, transformations (`map`, `filter`, `flatMap`, `distinct`), actions (`collect`, `count`, `reduce`), pair RDD operations (`reduceByKey`, `groupByKey`), set operations, persistence, and converting to/from DataFrames (including a real CSV dataset via `spark.read.csv()`)
 
 Each example includes runnable code and detailed comments for learning purposes.
 

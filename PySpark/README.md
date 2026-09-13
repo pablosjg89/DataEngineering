@@ -54,6 +54,22 @@ This directory contains a collection of PySpark examples for learning and refere
    - Exploding nested structures
    - Practical use cases for semi-structured data
 
+9. **09_udfs_and_pandas_udfs.py** - PySpark UDFs and Pandas UDFs
+   - PySpark UDFs (regular, row-at-a-time) with `udf()` and `spark.udf.register()`
+   - A multi-column UDF (several fields passed as separate arguments in one call)
+   - Why declaring the return type (`StringType()`, etc.) matters: Spark can't infer
+     it from a Python function running in a separate worker process, and a wrong or
+     missing type silently produces corrupted columns instead of an error
+   - A UDF returning several different types at once via a `StructType` schema
+     (a tuple of `(str, float, bool)` mapped to `StringType`/`DoubleType`/`BooleanType`
+     fields) - `udf()` always takes exactly one `returnType`, never several positional ones
+   - Scalar Pandas UDFs with `@pandas_udf` for vectorized, Arrow-backed transforms
+   - Grouped-map Pandas UDFs with `applyInPandas()` for per-group pandas logic
+   - When to reach for built-in functions vs. a PySpark UDF vs. a Pandas UDF
+   - Tradeoff: Pandas UDFs scale better on bigger DataFrames (vectorized, Arrow-backed);
+     PySpark UDFs are more convenient since `udf()` works across every node in the
+     Spark session immediately, with no registration step required
+
 ## About pyspark.sql.functions (alias F)
 
 Many examples import pyspark.sql.functions and alias it as `F` (for example: `from pyspark.sql import functions as F`). This module provides essential SQL-style functions including:
@@ -81,6 +97,8 @@ python 04_file_operations.py
 python 05_sql_queries.py
 python 06_structured_formats.py
 python 07_functions_library.py
+python 08_arrays_and_maps.py
+python 09_udfs_and_pandas_udfs.py
 ```
 
 ## Notes
